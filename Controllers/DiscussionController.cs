@@ -34,88 +34,88 @@ namespace SellerActiveChallenge.Controllers
         // Page size for "show latest"
         private const int PAGESIZE = 10;
 
-        [HttpGet("routes")]
-        public String ListRoutes()
+        private IEnumerable<Object> ListAll(String entity)
         {
-            return "<a href='/discussion/users'>Users</a><br>\n<a href='/discussion/posts'>Posts</a><br>\n";
+            try
+            {
+                return Model.GetTableForEntity(entity);
+            }
+            catch (Exception e)
+            {
+                return (IEnumerable<Object>)NotFoundHandler(e);
+            }
+        }
+
+        private Object FetchById(String entity, int id)
+        {
+            try
+            {
+                return Model.GetRecordById(entity, id);
+            }
+            catch (Exception e)
+            {
+                return NotFoundHandler(e);
+            }
+        }
+
+        private IEnumerable<Object> ListForField(String entity, String field, int value)
+        {
+            try
+            {
+                return Model.GetTableByFieldValue(entity, field, value.ToString());
+            }
+            catch (Exception e)
+            {
+                return (IEnumerable<Object>)NotFoundHandler(e);
+            }
+        }
+
+        private Object FetchByAlternateKey(String entity, String field, string email)
+        {
+            try
+            {
+                return Model.GetRecordByFieldValue(entity, field, email);
+            }
+            catch (Exception e)
+            {
+                return NotFoundHandler(e);
+            }
         }
 
         [HttpGet(ROUTES.USERS)]
         public IEnumerable<Object> ListAllUsers()
         {
-            try
-            {
-                return Model.GetTableForEntity(Model.USERS);
-            }
-            catch (Exception e)
-            {
-                return (IEnumerable<Object>)NotFoundHandler(e);
-            }
+            return ListAll(Model.USERS);
         }
 
         [HttpGet(ROUTES.USER)]
         public Object FetchUserById(int id)
         {
-            try
-            {
-                return Model.GetRecordById(Model.USERS, id);
-            }
-            catch (Exception e)
-            {
-                return NotFoundHandler(e);
-            }
+            return FetchById(Model.USERS, id);
         }
 
         [HttpGet(ROUTES.USER_EMAIL)]
         public Object FetchUserByEmail(string email)
         {
-            try
-            {
-                return Model.GetRecordByFieldValue(Model.USERS, Model.EMAIL, email);
-            }
-            catch (Exception e)
-            {
-                return NotFoundHandler(e);
-            }
+            return FetchByAlternateKey(Model.USERS, Model.EMAIL, email);
         }
 
         [HttpGet(ROUTES.POSTS)]
         public IEnumerable<Object> ListAllPosts()
         {
-            try
-            {
-                return Model.GetTableForEntity(Model.POSTS);
-            }
-            catch (Exception e)
-            {
-                return (IEnumerable<Object>)NotFoundHandler(e);
-            }
+            return ListAll(Model.POSTS);
         }
 
         [HttpGet(ROUTES.POST)]
         public Object FetchPostById(int id)
         {
-            try
-            {
-                return Model.GetRecordById(Model.POSTS, id);
-            }
-            catch (Exception e)
-            {
-                return NotFoundHandler(e);
-            }
+            return FetchById(Model.POSTS, id);
         }
 
         [HttpGet(ROUTES.POSTS_USER)]
         public IEnumerable<Object> ListPostsForUserId(int userId)
         {
-            try
-            {
-                return Model.GetTableByFieldValue(Model.POSTS, Model.USERID, userId.ToString());
-            }
-            catch (Exception e)
-            {
-                return (IEnumerable<Object>)NotFoundHandler(e);
-            }
+            return ListForField(Model.POSTS, Model.USERID, userId);
         }
 
         [HttpGet(ROUTES.POSTS_LATEST)]
@@ -147,40 +147,19 @@ namespace SellerActiveChallenge.Controllers
         [HttpGet(ROUTES.COMMENTS)]
         public IEnumerable<Object> ListAllComments()
         {
-            try
-            {
-                return Model.GetTableForEntity(Model.COMMENTS);
-            }
-            catch (Exception e)
-            {
-                return (IEnumerable<Object>)NotFoundHandler(e);
-            }
+            return ListAll(Model.USERS);
         }
 
         [HttpGet(ROUTES.COMMENT)]
         public Object FetchCommentById(int id)
         {
-            try
-            {
-                return Model.GetRecordById(Model.COMMENTS, id);
-            }
-            catch (Exception e)
-            {
-                return NotFoundHandler(e);
-            }
+            return FetchById(Model.COMMENTS, id);
         }
 
         [HttpGet(ROUTES.COMMENTS_POST)]
         public IEnumerable<Object> ListCommentsForPostId(int postId)
         {
-            try
-            {
-                return Model.GetTableByFieldValue(Model.COMMENTS, Model.POSTID, postId.ToString());
-            }
-            catch (Exception e)
-            {
-                return (IEnumerable<Object>)NotFoundHandler(e);
-            }
+            return ListForField(Model.COMMENTS, Model.POSTID, postId);
         }
 
         private NotFoundResult NotFoundHandler(Exception e)

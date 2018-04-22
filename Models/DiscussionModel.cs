@@ -37,32 +37,25 @@ namespace SellerActiveChallenge.Controllers
         static private string rootUrl = "http://jsonplaceholder.typicode.com/";
 
         // executes rooted query and returns string response
-        static private String GetDataFromQuery(string query)
+        static private String Query(string query)
         {
             return Model.GetDataFromUrl(Model.rootUrl + query);
         }
 
-        // executes query and returns record from response
-        static private Object GetRecordFromQuery(string query)
+        // executes query and returns generic object from json response
+        static private T QueryJson<T>(string query)
         {
-            String data = GetDataFromQuery(query);
-            return JsonConvert.DeserializeObject<Object>(data);
-        }
-
-        // executes query and returns array of records from response
-        static private Object[] GetTableFromQuery(string query)
-        {
-            String data = GetDataFromQuery(query);
-            return JsonConvert.DeserializeObject<Object[]>(data);
+            String data = Query(query);
+            return JsonConvert.DeserializeObject<T>(data);
         }
 
         // get array of records for an entity
         static public Object[] GetTableForEntity(string entity)
         {
-            return GetTableFromQuery(entity);
+            return QueryJson<Object[]>(entity);
         }
 
-        // get array of latest records for an entity
+                // get array of latest records for an entity
         static public Object[] GetLatest(string entity, int pageSize)
         {
             Object[] table = GetTableForEntity(entity);
@@ -73,21 +66,21 @@ namespace SellerActiveChallenge.Controllers
         static public Object GetRecordById(string entity, int id)
         {
             string query = entity + "/" + id.ToString();
-            return GetRecordFromQuery(query);
+            return QueryJson<Object>(query);
         }
 
         // gets entity record by a field value
         static public Object GetRecordByFieldValue(string entity, string field, string value)
         {
             string query = entity + "?" + field + "=" + value;
-            return GetTableFromQuery(query)[0];
+            return QueryJson<Object[]>(query)[0];
         }
 
         // gets array of entity records by a field value
         static public Object[] GetTableByFieldValue(string entity, string field, string value)
         {
             string query = entity + "?" + field + "=" + value;
-            return GetTableFromQuery(query);
+            return QueryJson<Object[]>(query);
         }
 
         // gets array of latest records entity records by a field value
