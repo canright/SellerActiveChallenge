@@ -13,6 +13,7 @@ export class ChallengeComponent {
   private users: User[];
   private baseUrl: String;
   private http: HttpClient;
+  public all: boolean = true;
 
   decoratePosts(posts, users) {
     if (posts && users) {
@@ -51,6 +52,7 @@ export class ChallengeComponent {
   }
 
   filterPosts(userId: number) {
-    this.posts = (userId == 0) ? this.allPosts : this.allPosts.filter((post) => post.userId == userId);
+    this.all = userId == 0;
+    this.posts = this.all ? this.allPosts : this.allPosts.filter((post) => post.userId == userId);
   }
 }

@@ -13,6 +13,7 @@ export class LatestComponent {
   private users: User[];
   private baseUrl: String;
   private http: HttpClient;
+  public all: boolean = true;
 
   decoratePosts(posts, users) {
     if (posts && users) {
@@ -59,7 +60,8 @@ export class LatestComponent {
   }
 
   latestPostsFor(userId: number) {
-    if (userId == 0) {
+    this.all = userId == 0;
+    if (this.all) {
       this.posts = this.allPosts
     } else {
       this.getLatestPostsFor(userId);

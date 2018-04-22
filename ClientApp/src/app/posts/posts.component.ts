@@ -11,6 +11,7 @@ export class PostsComponent {
   private allPosts: Post[];
   private posts: Post[];
   private users: User[];
+  public all: boolean = true;
 
   decoratePosts(posts, users) {
     if (posts && users) {
@@ -45,8 +46,8 @@ export class PostsComponent {
     }, error => console.error(error));
   }
 
-  filterPosts(filterVal: any) {
-    this.posts = (filterVal == "0") ? this.allPosts : this.allPosts.filter((post) => post.userId == filterVal);
+  filterPosts(userId: number) {
+    this.all = userId == 0;
+    this.posts = this.all ? this.allPosts : this.allPosts.filter((post) => post.userId == userId);
   }
-
 }
