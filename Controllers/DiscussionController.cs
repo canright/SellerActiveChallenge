@@ -1,65 +1,65 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
-using Typicode = SellerActiveChallenge.Models.Typicode;
+using ActiveModel = SellerActiveChallenge.Models.Typicode;
 
 namespace SellerActiveChallenge.Controllers
 {
     [Route("discussion")]
     public class DiscussionController : Controller
     {
-        [HttpGet("users")]
+        [HttpGet("users")] // List all Users
         public IActionResult ListAllUsers() =>
-            ListAll<Models.User>(Typicode.USERS);
+            ListAll<Models.User>(ActiveModel.USERS);
 
-        [HttpGet("users/{id}")]
+        [HttpGet("users/{id}")] // Fetch User by id
         public IActionResult FetchUserById(int id) =>
-            FetchById<Models.User>(Typicode.USERS, id);
+            FetchById<Models.User>(ActiveModel.USERS, id);
 
-        [HttpGet("users/email/{email}")]
+        [HttpGet("users/email/{email}")] // Fetch User by email
         public IActionResult FetchUserByEmail(string email) =>
-            FetchByAlternateKey<Models.User>(Typicode.USERS, Typicode.EMAIL, email);
+            FetchByAlternateKey<Models.User>(ActiveModel.USERS, ActiveModel.EMAIL, email);
 
-        [HttpGet("posts")]
+        [HttpGet("posts")] // List all Posts
         public IActionResult ListAllPosts() =>
-            ListAll<Models.Post>(Typicode.POSTS);
+            ListAll<Models.Post>(ActiveModel.POSTS);
 
-        [HttpGet("posts/{id}")]
+        [HttpGet("posts/{id}")] // Fetch Post by id
         public IActionResult FetchPostById(int id) =>
-            FetchById<Models.Post>(Typicode.POSTS, id);
+            FetchById<Models.Post>(ActiveModel.POSTS, id);
 
-        [HttpGet("posts/user/{userId}")]
+        [HttpGet("posts/user/{userId}")] // fetch Posts by User id
         public IActionResult ListPostsForUserId(int userId) =>
-            ListForField<Models.Post>(Typicode.POSTS, Typicode.USERID, userId);
+            ListForField<Models.Post>(ActiveModel.POSTS, ActiveModel.USERID, userId);
 
-        [HttpGet("posts/latest")]
+        [HttpGet("posts/latest")] // fetch latest Posts
         public IActionResult ListLatestPosts() =>
-            ListLatest<Models.Post>(Typicode.POSTS);
+            ListLatest<Models.Post>(ActiveModel.POSTS);
 
-        [HttpGet("posts/latest/{userId}")]
+        [HttpGet("posts/latest/{userId}")] // fetch latest Posts for User id
         public IActionResult ListLatestPostsForUserId(int userId) =>
-            ListLatestByFieldValue<Models.Post>(Typicode.POSTS, Typicode.USERID, userId.ToString());
+            ListLatestByFieldValue<Models.Post>(ActiveModel.POSTS, ActiveModel.USERID, userId.ToString());
 
-        [HttpGet("comments")]
+        [HttpGet("comments")] // fetch all comments
         public IActionResult ListAllComments() =>
-            ListAll<Models.Comment[]>(Typicode.COMMENTS);
+            ListAll<Models.Comment[]>(ActiveModel.COMMENTS);
 
-        [HttpGet("comments/{id}")]
+        [HttpGet("comments/{id}")] // fetch comment by id
         public IActionResult FetchCommentById(int id) =>
-            FetchById<Models.Comment>(Typicode.COMMENTS, id);
+            FetchById<Models.Comment>(ActiveModel.COMMENTS, id);
 
-        [HttpGet("comments/post/{postId}")]
+        [HttpGet("comments/post/{postId}")] // fetch comments for a Post id
         public IActionResult ListCommentsForPostId(int postId) =>
-            ListForField<Models.Comment>(Typicode.COMMENTS, Typicode.POSTID, postId);
+            ListForField<Models.Comment>(ActiveModel.COMMENTS, ActiveModel.POSTID, postId);
 
         // Page size for "show latest"
-        private const int PAGESIZE = 10;
+        private const int PAGESIZE = 10;  // maximum number of items on latest page
 
         private IActionResult ListAll<T>(String entity)
         {
             try
             {
-                return Json(Typicode.GetTableForEntity<T>(entity));
+                return Json(ActiveModel.GetTableForEntity<T>(entity));
             }
             catch (Exception e)
             {
@@ -71,7 +71,7 @@ namespace SellerActiveChallenge.Controllers
         {
             try
             {
-                return Json(Typicode.GetRecordById<T>(entity, id));
+                return Json(ActiveModel.GetRecordById<T>(entity, id));
             }
             catch (Exception e)
             {
@@ -83,7 +83,7 @@ namespace SellerActiveChallenge.Controllers
         {
             try
             {
-                return Json(Typicode.GetTableByFieldValue<T>(entity, field, value.ToString()));
+                return Json(ActiveModel.GetTableByFieldValue<T>(entity, field, value.ToString()));
             }
             catch (Exception e)
             {
@@ -95,7 +95,7 @@ namespace SellerActiveChallenge.Controllers
         {
             try
             {
-                return Json(Typicode.GetRecordByFieldValue<T>(entity, field, email));
+                return Json(ActiveModel.GetRecordByFieldValue<T>(entity, field, email));
             }
             catch (Exception e)
             {
@@ -107,7 +107,7 @@ namespace SellerActiveChallenge.Controllers
         {
             try
             {
-                return Json(Typicode.GetLatest<T>(entity, PAGESIZE));
+                return Json(ActiveModel.GetLatest<T>(entity, PAGESIZE));
             }
             catch (Exception e)
             {
@@ -119,7 +119,7 @@ namespace SellerActiveChallenge.Controllers
         {
             try
             {
-                return Json(Typicode.GetLatestByFieldValue<T>(Entity, Field, Value, PAGESIZE));
+                return Json(ActiveModel.GetLatestByFieldValue<T>(Entity, Field, Value, PAGESIZE));
             }
             catch (Exception e)
             {
