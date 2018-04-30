@@ -1,56 +1,65 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-/*
-using System.Web;
-using System.Net;
-using System.Net.Http;
-*/
+
+using Typicode = SellerActiveChallenge.Models.Typicode;
 
 namespace SellerActiveChallenge.Controllers
 {
     [Route("discussion")]
     public class DiscussionController : Controller
     {
-        // all routes specified here for easy reference
-        private static class ROUTES
-        {
-            public const String USERS = "users";
-            public const String USER = "users/{id}";
-            public const String USER_EMAIL = "users/email/{email}";
-            public const String POSTS = "posts";
-            public const String POST = "posts/{id}";
-            public const String POSTS_USER = "posts/user/{userId}";
-            public const String POSTS_LATEST = "posts/latest";
-            public const String POSTS_LATEST_USER = "posts/latest/{userId}";
-            public const String COMMENTS = "comments";
-            public const String COMMENT = "comments/{id}";
-            public const String COMMENTS_POST = "comments/post/{postId}";
-        }
+        [HttpGet("users")]
+        public IActionResult ListAllUsers() =>
+            ListAll<Models.User>(Typicode.USERS);
+
+        [HttpGet("users/{id}")]
+        public IActionResult FetchUserById(int id) =>
+            FetchById<Models.User>(Typicode.USERS, id);
+
+        [HttpGet("users/email/{email}")]
+        public IActionResult FetchUserByEmail(string email) =>
+            FetchByAlternateKey<Models.User>(Typicode.USERS, Typicode.EMAIL, email);
+
+        [HttpGet("posts")]
+        public IActionResult ListAllPosts() =>
+            ListAll<Models.Post>(Typicode.POSTS);
+
+        [HttpGet("posts/{id}")]
+        public IActionResult FetchPostById(int id) =>
+            FetchById<Models.Post>(Typicode.POSTS, id);
+
+        [HttpGet("posts/user/{userId}")]
+        public IActionResult ListPostsForUserId(int userId) =>
+            ListForField<Models.Post>(Typicode.POSTS, Typicode.USERID, userId);
+
+        [HttpGet("posts/latest")]
+        public IActionResult ListLatestPosts() =>
+            ListLatest<Models.Post>(Typicode.POSTS);
+
+        [HttpGet("posts/latest/{userId}")]
+        public IActionResult ListLatestPostsForUserId(int userId) =>
+            ListLatestByFieldValue<Models.Post>(Typicode.POSTS, Typicode.USERID, userId.ToString());
+
+        [HttpGet("comments")]
+        public IActionResult ListAllComments() =>
+            ListAll<Models.Comment[]>(Typicode.COMMENTS);
+
+        [HttpGet("comments/{id}")]
+        public IActionResult FetchCommentById(int id) =>
+            FetchById<Models.Comment>(Typicode.COMMENTS, id);
+
+        [HttpGet("comments/post/{postId}")]
+        public IActionResult ListCommentsForPostId(int postId) =>
+            ListForField<Models.Comment>(Typicode.COMMENTS, Typicode.POSTID, postId);
 
         // Page size for "show latest"
         private const int PAGESIZE = 10;
 
-        private IEnumerable<Object> ListAll(String entity)
+        private IActionResult ListAll<T>(String entity)
         {
             try
             {
-                return Model.GetTableForEntity(entity);
-            }
-            catch (Exception e)
-            {
-                return (IEnumerable<Object>)NotFoundHandler(e);
-            }
-        }
-
-        private Object FetchById(String entity, int id)
-        {
-            try
-            {
-                return Model.GetRecordById(entity, id);
+                return Json(Typicode.GetTableForEntity<T>(entity));
             }
             catch (Exception e)
             {
@@ -58,23 +67,11 @@ namespace SellerActiveChallenge.Controllers
             }
         }
 
-        private IEnumerable<Object> ListForField(String entity, String field, int value)
+        private IActionResult FetchById<T>(String entity, int id)
         {
             try
             {
-                return Model.GetTableByFieldValue(entity, field, value.ToString());
-            }
-            catch (Exception e)
-            {
-                return (IEnumerable<Object>)NotFoundHandler(e);
-            }
-        }
-
-        private Object FetchByAlternateKey(String entity, String field, string email)
-        {
-            try
-            {
-                return Model.GetRecordByFieldValue(entity, field, email);
+                return Json(Typicode.GetRecordById<T>(entity, id));
             }
             catch (Exception e)
             {
@@ -82,84 +79,52 @@ namespace SellerActiveChallenge.Controllers
             }
         }
 
-        [HttpGet(ROUTES.USERS)]
-        public IEnumerable<Object> ListAllUsers()
-        {
-            return ListAll(Model.USERS);
-        }
-
-        [HttpGet(ROUTES.USER)]
-        public Object FetchUserById(int id)
-        {
-            return FetchById(Model.USERS, id);
-        }
-
-        [HttpGet(ROUTES.USER_EMAIL)]
-        public Object FetchUserByEmail(string email)
-        {
-            return FetchByAlternateKey(Model.USERS, Model.EMAIL, email);
-        }
-
-        [HttpGet(ROUTES.POSTS)]
-        public IEnumerable<Object> ListAllPosts()
-        {
-            return ListAll(Model.POSTS);
-        }
-
-        [HttpGet(ROUTES.POST)]
-        public Object FetchPostById(int id)
-        {
-            return FetchById(Model.POSTS, id);
-        }
-
-        [HttpGet(ROUTES.POSTS_USER)]
-        public IEnumerable<Object> ListPostsForUserId(int userId)
-        {
-            return ListForField(Model.POSTS, Model.USERID, userId);
-        }
-
-        [HttpGet(ROUTES.POSTS_LATEST)]
-        public IEnumerable<Object> ListLatestPosts()
+        private IActionResult ListForField<T>(String entity, String field, int value)
         {
             try
             {
-                return Model.GetLatest(Model.POSTS, PAGESIZE);
+                return Json(Typicode.GetTableByFieldValue<T>(entity, field, value.ToString()));
             }
             catch (Exception e)
             {
-                return (IEnumerable<Object>)NotFoundHandler(e);
+                return NotFoundHandler(e);
             }
         }
 
-        [HttpGet(ROUTES.POSTS_LATEST_USER)]
-        public IEnumerable<Object> ListLatestPostsForUserId(int userId)
+        private IActionResult FetchByAlternateKey<T>(String entity, String field, string email)
         {
             try
             {
-                return Model.GetLatestByFieldValue(Model.POSTS, Model.USERID, userId.ToString(), PAGESIZE);
+                return Json(Typicode.GetRecordByFieldValue<T>(entity, field, email));
             }
             catch (Exception e)
             {
-                return (IEnumerable<Object>)NotFoundHandler(e);
+                return NotFoundHandler(e);
             }
         }
 
-        [HttpGet(ROUTES.COMMENTS)]
-        public IEnumerable<Object> ListAllComments()
+        private IActionResult ListLatest<T>(String entity)
         {
-            return ListAll(Model.USERS);
+            try
+            {
+                return Json(Typicode.GetLatest<T>(entity, PAGESIZE));
+            }
+            catch (Exception e)
+            {
+                return NotFoundHandler(e);
+            }
         }
 
-        [HttpGet(ROUTES.COMMENT)]
-        public Object FetchCommentById(int id)
+        private IActionResult ListLatestByFieldValue<T>(String Entity, String Field, String Value)
         {
-            return FetchById(Model.COMMENTS, id);
-        }
-
-        [HttpGet(ROUTES.COMMENTS_POST)]
-        public IEnumerable<Object> ListCommentsForPostId(int postId)
-        {
-            return ListForField(Model.COMMENTS, Model.POSTID, postId);
+            try
+            {
+                return Json(Typicode.GetLatestByFieldValue<T>(Entity, Field, Value, PAGESIZE));
+            }
+            catch (Exception e)
+            {
+                return NotFoundHandler(e);
+            }
         }
 
         private NotFoundResult NotFoundHandler(Exception e)
@@ -169,5 +134,6 @@ namespace SellerActiveChallenge.Controllers
             else
                 throw e;
         }
+
     }
 }

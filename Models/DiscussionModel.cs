@@ -1,18 +1,63 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using System.IO;
-using System.Web;
+using System.Net;
 using Newtonsoft.Json;
 
-namespace SellerActiveChallenge.Controllers
+namespace SellerActiveChallenge.Models
 {
-   public class Model
+    public class Post
+    {
+        public int userId { get; set; } // FK - User
+        public int id { get; set; } // PK
+        public string title { get; set; }
+        public string body { get; set; }
+    };
+
+    public class Comment
+    {
+        public int postId { get; set; } // FK - Post
+        public int id { get; set; } // PK
+        public string name { get; set; }
+        public string email { get; set; } // AFK - User
+        public string body { get; set; }
+    }
+
+    public class User
+    {
+        public int id { get; set; } // PK
+        public string name { get; set; }
+        public string userName { get; set; }
+        public string email { get; set; } // AK - unique among all Users
+        public Address address;
+        public string phone { get; set; }
+        public string website { get; set; }
+        public Company company;
+    };
+
+        public class Company
+    {
+        public string name { get; set; }
+        public string catchPhrase { get; set; }
+        public string bs { get; set; }
+
+    }
+
+    public class Address
+    {
+        public string street { get; set; }
+        public string suite { get; set; }
+        public string city { get; set; }
+        public string zipcode { get; set; }
+        public Geo geo;
+    }
+
+    public class Geo
+    {
+        public string lat { get; set; }
+        public string lng { get; set; }
+    }
+
+   public class Typicode
     {
         public const string ID = "id";
         public const string USERS = "Users";
@@ -37,65 +82,42 @@ namespace SellerActiveChallenge.Controllers
         static private string rootUrl = "http://jsonplaceholder.typicode.com/";
 
         // executes rooted query and returns string response
-        static private String Query(string query)
-        {
-            return Model.GetDataFromUrl(Model.rootUrl + query);
-        }
+        static public String Query(string query) =>
+            GetDataFromUrl(rootUrl + query);
 
         // executes query and returns generic object from json response
-        static private T QueryJson<T>(string query)
-        {
-            String data = Query(query);
-            return JsonConvert.DeserializeObject<T>(data);
-        }
+        static public T[] QueryJson<T>(string query) =>
+            JsonConvert.DeserializeObject<T[]>(Query(query));
 
         // get array of records for an entity
-        static public Object[] GetTableForEntity(string entity)
-        {
-            return QueryJson<Object[]>(entity);
-        }
+        static public T[] GetTableForEntity<T>(string entity) =>
+            QueryJson<T>(entity);
 
-                // get array of latest records for an entity
-        static public Object[] GetLatest(string entity, int pageSize)
-        {
-            Object[] table = GetTableForEntity(entity);
-            return SpliceLatest(table, pageSize);
-        }
+        // get array of latest records for an entity
+        static public T[] GetLatest<T>(string entity, int pageSize) =>
+            SpliceLatest<T>(GetTableForEntity<T>(entity), pageSize);
 
         // gets identified record of entity
-        static public Object GetRecordById(string entity, int id)
-        {
-            string query = entity + "/" + id.ToString();
-            return QueryJson<Object>(query);
-        }
+        static public T[] GetRecordById<T>(string entity, int id) =>
+            QueryJson<T>(entity + "/" + id.ToString());
 
         // gets entity record by a field value
-        static public Object GetRecordByFieldValue(string entity, string field, string value)
-        {
-            string query = entity + "?" + field + "=" + value;
-            return QueryJson<Object[]>(query)[0];
-        }
+        static public T GetRecordByFieldValue<T>(string entity, string field, string value) =>
+            QueryJson<T>(entity + "?" + field + "=" + value)[0];
 
         // gets array of entity records by a field value
-        static public Object[] GetTableByFieldValue(string entity, string field, string value)
-        {
-            string query = entity + "?" + field + "=" + value;
-            return QueryJson<Object[]>(query);
-        }
+        static public T[] GetTableByFieldValue<T>(string entity, string field, string value) =>
+            QueryJson<T>(entity + "?" + field + "=" + value);
 
         // gets array of latest records entity records by a field value
-        static public Object[] GetLatestByFieldValue(string entity, string field, string value, int pageSize)
-        {
-            Object[] table = GetTableByFieldValue(entity, field, value);
-            return SpliceLatest(table, pageSize);
-        }
+        static public T[] GetLatestByFieldValue<T>(string entity, string field, string value, int pageSize) =>
+            SpliceLatest<T>(GetTableByFieldValue<T>(entity, field, value), pageSize);
 
-        // returns last (pageSize) records from the sourc table
-        // the last records are the latest
-        static public Object[] SpliceLatest(Object[] source, int pageSize)
+        // returns last (pageSize) records from the source table - the last records are the latest
+        static public T[] SpliceLatest<T>(T[] source, int pageSize)
         {
             int len = (source.Length >= pageSize) ? pageSize : source.Length;
-            Object[] target = Array.ConvertAll(new Array[len], item => (Object)item);
+            T[] target = Array.ConvertAll(new T[len], item => (T)item);
             Array.Copy(source, source.Length - len, target, 0, len);
             return target;
         }
