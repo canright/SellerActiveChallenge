@@ -1,7 +1,11 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
+using Models      = SellerActiveChallenge.Models;
 using ActiveModel = SellerActiveChallenge.Models.Typicode;
+using User        = SellerActiveChallenge.Models.User;
+using Post        = SellerActiveChallenge.Models.Post;
+using Comment     = SellerActiveChallenge.Models.Comment;
 
 namespace SellerActiveChallenge.Controllers
 {
@@ -10,47 +14,47 @@ namespace SellerActiveChallenge.Controllers
     {
         [HttpGet("users")] // List all Users
         public IActionResult ListAllUsers() =>
-            ListAll<Models.User>(ActiveModel.USERS);
+            ListAll<User>(ActiveModel.USERS);
 
         [HttpGet("users/{id}")] // Fetch User by id
         public IActionResult FetchUserById(int id) =>
-            FetchById<Models.User>(ActiveModel.USERS, id);
+            FetchById<User>(ActiveModel.USERS, id);
 
         [HttpGet("users/email/{email}")] // Fetch User by email
         public IActionResult FetchUserByEmail(string email) =>
-            FetchByAlternateKey<Models.User>(ActiveModel.USERS, ActiveModel.EMAIL, email);
+            FetchByAlternateKey<User>(ActiveModel.USERS, ActiveModel.EMAIL, email);
 
         [HttpGet("posts")] // List all Posts
         public IActionResult ListAllPosts() =>
-            ListAll<Models.Post>(ActiveModel.POSTS);
+            ListAll<Post>(ActiveModel.POSTS);
 
         [HttpGet("posts/{id}")] // Fetch Post by id
         public IActionResult FetchPostById(int id) =>
-            FetchById<Models.Post>(ActiveModel.POSTS, id);
+            FetchById<Post>(ActiveModel.POSTS, id);
 
         [HttpGet("posts/user/{userId}")] // fetch Posts by User id
         public IActionResult ListPostsForUserId(int userId) =>
-            ListForField<Models.Post>(ActiveModel.POSTS, ActiveModel.USERID, userId);
+            ListForField<Post>(ActiveModel.POSTS, ActiveModel.USERID, userId);
 
         [HttpGet("posts/latest")] // fetch latest Posts
         public IActionResult ListLatestPosts() =>
-            ListLatest<Models.Post>(ActiveModel.POSTS);
+            ListLatest<Post>(ActiveModel.POSTS);
 
         [HttpGet("posts/latest/{userId}")] // fetch latest Posts for User id
         public IActionResult ListLatestPostsForUserId(int userId) =>
-            ListLatestByFieldValue<Models.Post>(ActiveModel.POSTS, ActiveModel.USERID, userId.ToString());
+            ListLatestByFieldValue<Post>(ActiveModel.POSTS, ActiveModel.USERID, userId.ToString());
 
         [HttpGet("comments")] // fetch all comments
         public IActionResult ListAllComments() =>
-            ListAll<Models.Comment[]>(ActiveModel.COMMENTS);
+            ListAll<Comment[]>(ActiveModel.COMMENTS);
 
         [HttpGet("comments/{id}")] // fetch comment by id
         public IActionResult FetchCommentById(int id) =>
-            FetchById<Models.Comment>(ActiveModel.COMMENTS, id);
+            FetchById<Comment>(ActiveModel.COMMENTS, id);
 
         [HttpGet("comments/post/{postId}")] // fetch comments for a Post id
         public IActionResult ListCommentsForPostId(int postId) =>
-            ListForField<Models.Comment>(ActiveModel.COMMENTS, ActiveModel.POSTID, postId);
+            ListForField<Comment>(ActiveModel.COMMENTS, ActiveModel.POSTID, postId);
 
         // Page size for "show latest"
         private const int PAGESIZE = 10;  // maximum number of items on latest page
